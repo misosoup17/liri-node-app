@@ -1,9 +1,11 @@
-require("dotenv").config();
+require ("dotenv").config();
 var keys = require("./keys")
 var request = require("request")
 var Spotify = require("node-spotify-api")
 var dateFormat = require("dateFormat")
 var fs = require("fs")
+
+
 
 // Takes an artist and searches the Bands in Town 
 // Artist API for an artist and render information
