@@ -1,146 +1,137 @@
-require ("dotenv").config();
-var keys = require("./keys")
-var request = require("request")
-var Spotify = require("node-spotify-api")
-var dateFormat = require("dateFormat")
-var fs = require("fs")
+require("dotenv").config();
+var twitter = require("twitter");
+var Spotify = require("node-spotify-api");
+const keys = require("./keys.js");
+var inquirer = require("inquirer");
+//Twitter API Keys
+var client = new twitter(keys.twitter);
+// Spotify API Keys
+var spotify = new Spotify(keys.spotify);
+
+//------------------------
+
+var nodeArgs = process.argv;
+var params = {
+    screen_name: 'T1BasicMountain'
+}
+//This function will pull the most recent tweets for my twitter profile (this profile has only 20 tweets, all forming the poem Invictus by William E. Henley, at the time of writing this at least)
+function recallTweets() {
+    client.get('statuses/user_timeline', params, function (error, tweets, response) {
+        if (!error) {
+            tweets.reverse().forEach(element => {
+                console.log(`
+            ------
+            ${element.text}`
+                    //${element.created_at} was omitted because my 20 tweets are park of a poem, and that makes the formatting look ugly.
+                );
+            });
+            liriInit();
+
+        }
+    })
+};
+//if songTitle is blank, replace it with 'The Sign'
+function playSong() {
+    inquirer.prompt([{
+        type: "input",
+        message: "What do you want me to look up?",
+        name: "query"
+    }]).then(function (inquirerResponse) {
+        spotify.search({
+            type: 'track',
+            query: inquirerResponse.query,
+            limit: 1
+        }, function (err, data) {
+            if (!err) {
+                var songObj = data.tracks.items[0];
+                var artistName = songObj.album.artists[0].name;
+                console.log(`
+            Artist: ${artistName}
+            Song title: ${inquirerResponse.query}
+            Album Name: ${songObj.album.name}
+            Preview URL: ${songObj.preview_url}`);
+                liriInit();
+            } else {
+                console.log(`Error: ${err}`);
+            }
+        })
+    })
+};
+// playSong(songTitle);
+
+//OMDB API call
+
+var request = require("request");
+//Parse movieName to add +'s
+function movieQuery() {
+    inquirer.prompt([{
+        type: "input",
+        message: "What do you want me to look up?",
+        name: "query"
+    }]).then(function (inquirerResponse) {
+        request(`http://www.omdbapi.com/?t=${inquirerResponse.query}&apikey=trilogy`, function (err, response, body) {
+            if (!err && response.statusCode === 200) {
+                var movieObj = JSON.parse(body);
+                // console.log(movieObj);
+                console.log(`
+                Movie Title: ${movieObj.Title}
+                Year Released: ${movieObj.Year}
+                IMDB Rating: ${movieObj.Ratings[0].Value}
+                Rotten Tomtoes Rating: ${movieObj.Ratings[1].Value}
+                Produced in: ${movieObj.Country}
+                Language(s): ${movieObj.Language}
+                Plot: ${movieObj.Plot}
+                Actors: ${movieObj.Actors}
+                 `);
+                 liriInit();
+            }
+        })
+    })
+};
+//Opens the text file and reads what's inside, triggering a command
+var fs = require("fs");
+
+function doThis() {
+    fs.readFile('random.txt', 'utf8', function (error, data) {
+        if (error) {
+            return console.log(error);
+        }
+        console.log(data);
+    })
+};
 
 
 
-// Takes an artist and searches the Bands in Town 
-// Artist API for an artist and render information
-var concertThis = function(artist){
-    var region = ""
-    var queryUrl = "https://rest.bandsintown.com/artists/" + artist.replace(" ", "+") + "/events?app_id=codingbootcamp"
-    //console.log(queryUrl);
-    
-    request(queryUrl, function(err, response, body){
-        // If the request is successful
-        if (!err && response.statusCode === 200) {
-            // Save parsed body in a new variable for easier use
-            var concertInfo = JSON.parse(body)
-            
-            outputData(artist + " concert information:")
-
-            for (i=0; i < concertInfo.length; i++) {
-                
-                region = concertInfo[i].venue.region
-                 //handle Canadian venues
-                if (region === "") {
-                    region = concertInfo[i].venue.country
-                }
-
-                // Need to return Name of venue, Venue location, Date of event (MM/DD/YYYY)
-                outputData("Venue: " + concertInfo[i].venue.name)
-                outputData("Location: " + concertInfo[i].venue.city + ", " + region);
-                outputData("Date: " + dateFormat(concertInfo[i].datetime, "mm/dd/yyyy"))
+function liriInit() {
+    inquirer.prompt([{
+            type: "list",
+            message: "Hello! What would you like to do?",
+            choices: ["Read my tweets", "Spotify this song", "Movie this!", "Do whatever"],
+            name: "userCommand"
+        },
+        {
+            type: "confirm",
+            message: "Are you sure?",
+            name: "confirm",
+            default: true
+        }
+    ]).then(function (inquirerResponse) {
+        if (inquirerResponse.confirm) {
+            switch (inquirerResponse.userCommand) {
+                case "Read my tweets":
+                    recallTweets();
+                    break;
+                case "Spotify this song":
+                    playSong();
+                    break;
+                case "Movie this!":
+                    movieQuery();
+                    break;
+                case "Do whatever":
+                    doThis()
+                    break;
             }
         }
     })
 }
-
-// This will take a song, search spotify and return information
-var spotifyThisSong = function(song){
-    // Default should be "The Sign" by Ace of Base
-    if (!song){
-        song = "The Sign Ace of Base"
-    }
-
-    var spotify = new Spotify(keys.spotify);
-
-    spotify.search({type: "track", query: song, limit: 1}, function (err, data){
-        if (err) {
-            return console.log(err)
-        }
-
-        // Need to return Artist(s), Song Name, Album, Preview link of song from Spotify
-        var songInfo = data.tracks.items[0]
-        outputData(songInfo.artists[0].name)
-        outputData(songInfo.name)
-        outputData(songInfo.album.name)
-        outputData(songInfo.preview_url)
-    })
-}
-
-// This will take a movie, search IMDb and return information
-var movieThis = function(movie){
-    // Default should be "Mr. Nobody"
-    if (!movie){
-        movie = "Mr.+Nobody"
-    }
-
-    var queryUrl = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=trilogy";
-    //console.log(queryUrl);
-
-    // Then create a request to the queryUrl
-    request(queryUrl, function(err, response, body){
-        // If the request is successful
-        if (!err && response.statusCode === 200) {
-            // Need to return: Title, Year, IMDB Rating, Rotten Tomatoes Rating, Country, 
-            // Language, Plot, Actors
-            var movieInfo = JSON.parse(body)
-
-            outputData("Title: " + movieInfo.Title)
-            outputData("Release year: " + movieInfo.Year)
-            outputData("IMDB Rating: " + movieInfo.imdbRating)
-            outputData("Rotten Tomatoes Rating: " + movieInfo.Ratings[1].Value)
-            outputData("Country: " + movieInfo.Country)
-            outputData("Language: " + movieInfo.Language)
-            outputData("Plot: " + movieInfo.Plot)
-            outputData("Actors: " + movieInfo.Actors)
-        }
-    })
-}
-
-// Using the `fs` Node package, LIRI will take the text inside of random.txt
-// and then use it to call one of LIRI's commands.
-var doWhatItSays = function(){
-
-    // read from file
-    fs.readFile("random.txt", "utf8", function (err, data) {
-        if(err){
-            return console.log(err)
-        }
-        
-        var dataArr = data.split(",")
-
-        // call appropriate function and pass arguement
-        runAction(dataArr[0], dataArr[1])
-    });
-}
-
-// This function will handle outputting to the console and writing to log file
-var outputData = function(data) {
-    console.log(data)
-
-    fs.appendFile("log.txt", "\r\n" + data, function (err){
-        if(err){
-            return console.log(err)
-        } 
-    })
-}
-
-var runAction = function(func, parm) {
-    switch (func) {
-        case "concert-this":
-            concertThis(parm)
-            break
-        case "spotify-this-song":
-            spotifyThisSong(parm)
-            break
-        case "movie-this":
-            movieThis(parm)
-            break
-        case "do-what-it-says":
-            doWhatItSays()
-            break
-        default:
-            outputData("That is not a command that I recognize, please try again.") 
-    }
-}
-
-runAction(process.argv[2], process.argv[3])
-
-
-
-
+liriInit();
