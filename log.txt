@@ -1,0 +1,82 @@
+**********EVENT INFO*********
+0
+Name of the Venue: Pickle Barrel Nightclub
+Venue Location: Killington
+Date of the Event: 2020-02-20T20:00:00
+*****************************
+**********EVENT INFO*********
+1
+Name of the Venue: Paradise Rock Club
+Venue Location: Boston
+Date of the Event: 2020-02-22T19:00:00
+*****************************
+**********EVENT INFO*********
+2
+Name of the Venue: The Roxy Theatre
+Venue Location: Los Angeles
+Date of the Event: 2020-03-27T21:00:00
+*****************************
+**********EVENT INFO*********
+3
+Name of the Venue: Voodoo Room at House of Blues
+Venue Location: San Diego
+Date of the Event: 2020-03-28T19:00:00
+*****************************
+**********EVENT INFO*********
+4
+Name of the Venue: Slim's
+Venue Location: San Francisco
+Date of the Event: 2020-04-02T20:00:00
+*****************************
+**********EVENT INFO*********
+5
+Name of the Venue: Columbia City Theater
+Venue Location: Seattle
+Date of the Event: 2020-04-05T19:00:00
+*****************************
+**********EVENT INFO*********
+6
+Name of the Venue: Lost Lake Lounge
+Venue Location: Denver
+Date of the Event: 2020-04-10T21:00:00
+*****************************
+**********EVENT INFO*********
+7
+Name of the Venue: Subterranean
+Venue Location: Chicago
+Date of the Event: 2020-04-18T19:00:00
+*****************************
+**********EVENT INFO*********
+8
+Name of the Venue: Mercy Lounge
+Venue Location: Nashville
+Date of the Event: 2020-04-24T20:00:00
+*****************************
+**********EVENT INFO*********
+9
+Name of the Venue: Sweetwater 420 Festival
+Venue Location: Atlanta
+Date of the Event: 2020-04-25T07:00:00
+*****************************
+**********EVENT INFO*********
+10
+Name of the Venue: Milkboy
+Venue Location: Philadelphia
+Date of the Event: 2020-05-02T20:30:00
+*****************************
+**********EVENT INFO*********
+11
+Name of the Venue: Union Stage
+Venue Location: Washington
+Date of the Event: 2020-05-15T21:00:00
+*****************************
+**********MOVIE INFO*********
+Title: Batman
+Release Year: 1989
+IMDB Rating: 7.5
+Rotten Tomatoes Rating: 72%
+Country of Production: USA, UK
+Language: English, French, Spanish
+Plot: The Dark Knight of Gotham City begins his war on crime with his first major enemy being the clownishly homicidal Joker.
+Actors: Michael Keaton, Jack Nicholson, Kim Basinger, Robert Wuhl
+*****************************
